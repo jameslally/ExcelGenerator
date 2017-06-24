@@ -1,4 +1,4 @@
-# ExcelInDotNetCore
+# Generate Excel files in DotNetCore
 
 
 ## Sample project to generate excel files in dot net core
@@ -12,4 +12,4 @@ http://localhost:49914/api/values
 #### XLS file (legacy)
 http://localhost:49914/api/values/legacy
 
-Note the ports may be different to the urls above. 
+*Note*: the ports may be different to the urls above. 
