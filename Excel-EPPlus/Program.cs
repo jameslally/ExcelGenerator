@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Excel_EPPlus
+namespace Excel.EPPlus
 {
     class Program
     {

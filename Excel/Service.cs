@@ -1,23 +1,37 @@
-﻿using Npoi.Core.HSSF.Util;
+﻿using Excel.Npoi;
+using Npoi.Core.HSSF.UserModel;
+using Npoi.Core.HSSF.Util;
 using Npoi.Core.SS.UserModel;
 using Npoi.Core.SS.Util;
 using Npoi.Core.XSSF.UserModel;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Excel.Npoi
+namespace ExcelNpoi
 {
-    class Program
-    {
-        static void Main(string[] args)
+    public class Service
+{
+
+        public async Task<Stream> GenerateXlsx()
         {
-            var newFile = @"newbook.core.xlsx";
+            return await Generate(new XSSFWorkbook());
+        }
 
-            using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
+        public async Task<Stream> GenerateXls()
+        {
+            return await Generate(new HSSFWorkbook());
+        }
+
+        public async Task<Stream> Generate(IWorkbook workbook)
+    {
+
+            var stream = new MemoryStreamNpoi();
+
+            await Task.Run(() =>
             {
-
-                IWorkbook workbook = new XSSFWorkbook();
-
                 ISheet sheet1 = workbook.CreateSheet("Sheet1");
 
                 sheet1.AddMergedRegion(new CellRangeAddress(0, 0, 0, 10));
@@ -46,11 +60,20 @@ namespace Excel.Npoi
                 cell2.CellStyle = style2;
                 cell2.SetCellValue(1);
 
-                workbook.Write(fs);
-            }
+                //Work around to a Java issue
+                //https://stackoverflow.com/questions/22931582/memorystream-seems-be-closed-after-npoi-workbook-write#37398007
+                stream.AllowClose = false;
+                workbook.Write(stream);
+                stream.AllowClose = true;
+            });
 
+            await stream.FlushAsync();
+
+            if (stream != null)
+                stream.Position = 0;
+            return stream;
+            
         }
-
-
     }
 }
+
